@@ -1,13 +1,39 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route, useParams, useNavigate, Navigate } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import Hero from './components/Hero.jsx';
 import ProductCategories from './components/ProductCategories.jsx';
 import About from './components/About.jsx';
 import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
+import defaultInstance from './api/defaultInstance';
 
-function App() {
+const SUPPORTED_LANGS = ['ka', 'ru', 'am'];
+
+function MainApp() {
+  const { lang } = useParams();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
+  const [language, setLanguage] = useState(SUPPORTED_LANGS.includes(lang) ? lang : 'ka');
+  const [translations, setTranslations] = useState({});
+
+  useEffect(() => {
+    if (lang !== language) setLanguage(lang);
+    // eslint-disable-next-line
+  }, [lang]);
+
+  useEffect(() => {
+    if (lang !== language) navigate(`/${language}`, { replace: true });
+    // eslint-disable-next-line
+  }, [language]);
+
+  useEffect(() => {
+    defaultInstance.get(`/translations/${language}`).then(res => {
+      const map = {};
+      (res.data || []).forEach(item => { map[item.key] = item.value; });
+      setTranslations(map);
+    });
+  }, [language]);
 
   const navigateToSection = useCallback((sectionId) => {
     const element = document.getElementById(sectionId);
@@ -41,25 +67,42 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <Header activeSection={activeSection} onNavigate={navigateToSection} />
+      <Header
+        activeSection={activeSection}
+        onNavigate={navigateToSection}
+        language={language}
+        setLanguage={setLanguage}
+        translations={translations}
+      />
 
       <main>
         <section id="home">
-          <Hero />
-          <ProductCategories />
+          <Hero language={language} translations={translations} />
+          <ProductCategories language={language} translations={translations} />
         </section>
 
         <section id="about">
-          <About />
+          <About language={language} translations={translations} />
         </section>
 
         <section id="contact">
-          <Contact />
+          <Contact language={language} translations={translations} />
         </section>
       </main>
 
-      <Footer onNavigate={navigateToSection} />
+      <Footer onNavigate={navigateToSection} language={language} translations={translations} />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/ka" replace />} />
+        <Route path="/:lang" element={<MainApp />} />
+      </Routes>
+    </Router>
   );
 }
 

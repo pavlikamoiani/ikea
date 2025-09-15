@@ -1,7 +1,41 @@
-import React, { memo } from 'react';
-import { ArrowRight, Phone } from 'lucide-react';
+import React, { memo, useState, useEffect } from 'react';
+import { Phone, Pencil } from 'lucide-react';
+import defaultInstance from '../api/defaultInstance';
 
-const Hero = memo(() => {
+const Hero = memo(({ language, translations = {} }) => {
+  // Editable state
+  const [editingField, setEditingField] = useState(null);
+  const [heading, setHeading] = useState(translations.hero_heading || 'Create Your');
+  const [highlight, setHighlight] = useState(translations.hero_highlight || 'Perfect Home');
+  const [description, setDescription] = useState(translations.hero_description || 'Discover affordable, functional, and beautiful furniture solutions for every room in your home');
+  const [phone, setPhone] = useState(translations.phone_number || 'Call');
+  const [editingPhone, setEditingPhone] = useState(false);
+
+  useEffect(() => {
+    setHeading(translations.hero_heading || 'Create Your');
+    setHighlight(translations.hero_highlight || 'Perfect Home');
+    setDescription(translations.hero_description || 'Discover affordable, functional, and beautiful furniture solutions for every room in your home');
+    setPhone(translations.phone_number || 'Call');
+  }, [translations]);
+
+  const handleHeadingBlur = () => {
+    setEditingField(null);
+    defaultInstance.post(`/translations/${language}`, { key: 'hero_heading', value: heading });
+  };
+  const handleHighlightBlur = () => {
+    setEditingField(null);
+    defaultInstance.post(`/translations/${language}`, { key: 'hero_highlight', value: highlight });
+  };
+  const handleDescriptionBlur = () => {
+    setEditingField(null);
+    defaultInstance.post(`/translations/${language}`, { key: 'hero_description', value: description });
+  };
+
+  const handlePhoneBlur = () => {
+    setEditingPhone(false);
+    defaultInstance.post(`/translations/${language}`, { key: 'phone_number', value: phone });
+  };
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -18,21 +52,128 @@ const Hero = memo(() => {
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-          Create Your
-          <span className="block text-[#FFDA1A]">Perfect Home</span>
-        </h1>
-        <p className="text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed">
-          Discover affordable, functional, and beautiful furniture solutions for every room in your home
-        </p>
+        <div className="flex flex-col items-center gap-2 mb-6">
+          <div className="relative inline-flex items-center justify-center">
+            {editingField === 'heading' ? (
+              <input
+                className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-0 leading-tight text-black w-full text-center pr-8"
+                value={heading}
+                onChange={e => setHeading(e.target.value)}
+                onBlur={handleHeadingBlur}
+                autoFocus
+                style={{ minWidth: 120 }}
+              />
+            ) : (
+              <span
+                className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-0 leading-tight text-white pr-8 cursor-pointer"
+                onDoubleClick={() => setEditingField('heading')}
+                style={{ position: 'relative' }}
+              >
+                {heading}
+                <button
+                  type="button"
+                  onClick={() => setEditingField('heading')}
+                  className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                  aria-label="Edit heading"
+                  tabIndex={-1}
+                >
+                  <Pencil size={18} className="text-gray-300 hover:text-[#FFDA1A]" />
+                </button>
+              </span>
+            )}
+          </div>
+          <div className="relative inline-flex items-center justify-center">
+            {editingField === 'highlight' ? (
+              <input
+                className="block text-[#FFDA1A] text-5xl sm:text-6xl lg:text-7xl font-bold mb-0 leading-tight w-full text-center pr-8"
+                value={highlight}
+                onChange={e => setHighlight(e.target.value)}
+                onBlur={handleHighlightBlur}
+                autoFocus
+                style={{ minWidth: 120 }}
+              />
+            ) : (
+              <span
+                className="block text-[#FFDA1A] text-5xl sm:text-6xl lg:text-7xl font-bold mb-0 leading-tight pr-8 cursor-pointer"
+                onDoubleClick={() => setEditingField('highlight')}
+                style={{ position: 'relative' }}
+              >
+                {highlight}
+                <button
+                  type="button"
+                  onClick={() => setEditingField('highlight')}
+                  className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                  aria-label="Edit highlight"
+                  tabIndex={-1}
+                >
+                  <Pencil size={18} className="text-gray-300 hover:text-[#FFDA1A]" />
+                </button>
+              </span>
+            )}
+          </div>
+          <div className="relative inline-flex items-center justify-center w-full">
+            {editingField === 'description' ? (
+              <textarea
+                className="text-xl sm:text-2xl mb-2 max-w-2xl mx-auto leading-relaxed text-black w-full pr-8"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                onBlur={handleDescriptionBlur}
+                autoFocus
+                style={{ minWidth: 120 }}
+              />
+            ) : (
+              <p
+                className="text-xl sm:text-2xl mb-8 max-w-2xl mx-auto leading-relaxed pr-8 cursor-pointer relative"
+                onDoubleClick={() => setEditingField('description')}
+                style={{ display: 'inline-block', position: 'relative' }}
+              >
+                {description}
+                <button
+                  type="button"
+                  onClick={() => setEditingField('description')}
+                  className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                  aria-label="Edit description"
+                  tabIndex={-1}
+                >
+                  <Pencil size={18} className="text-gray-300 hover:text-[#FFDA1A]" />
+                </button>
+              </p>
+            )}
+          </div>
+        </div>
         <div className="flex items-center justify-center">
-          <a
-            href="tel:+15551234567"
-            className="bg-[#FFDA1A] hover:bg-[#FFD000] text-[#0058A3] px-12 py-6 rounded-full font-bold text-2xl flex items-center space-x-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl border-4 border-white shadow-xl"
-          >
-            <Phone size={32} />
-            <span>Call +1 (555) 123-4567</span>
-          </a>
+          {editingPhone ? (
+            <input
+              className="text-2xl font-bold border border-[#0058A3] rounded px-4 py-2 w-80 text-center pr-10"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
+              onBlur={handlePhoneBlur}
+              autoFocus
+              style={{ minWidth: 180, color: '#000' }}
+            />
+          ) : (
+            <a
+              href={phone ? `tel:${phone.replace(/[^+\d]/g, '')}` : '#'}
+              className="bg-[#FFDA1A] hover:bg-[#FFD000] text-[#0058A3] px-12 py-6 rounded-full font-bold text-2xl flex items-center space-x-4 transition-all duration-300 hover:scale-105 hover:shadow-2xl border-4 border-white shadow-xl pr-10 relative"
+              style={{ position: 'relative', display: 'inline-flex' }}
+              onDoubleClick={() => setEditingPhone(true)}
+            >
+              <Phone size={32} />
+              <span>{phone}</span>
+              <button
+                type="button"
+                onClick={e => {
+                  e.preventDefault();
+                  setEditingPhone(true);
+                }}
+                className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                aria-label="Edit phone"
+                tabIndex={-1}
+              >
+                <Pencil size={20} className="text-gray-400 hover:text-[#0058A3]" />
+              </button>
+            </a>
+          )}
         </div>
       </div>
 
