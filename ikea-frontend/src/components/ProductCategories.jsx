@@ -6,16 +6,26 @@ import defaultInstance from '../api/defaultInstance';
 const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
   const [loadedImages, setLoadedImages] = useState(new Set());
 
-  // Editable state for heading and description
   const [editingField, setEditingField] = useState(null);
   const [heading, setHeading] = useState(translations.categories_heading || 'Shop by');
   const [highlight, setHighlight] = useState(translations.categories_highlight || 'Category');
   const [description, setDescription] = useState(translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
+  const [phone, setPhone] = useState(translations.phone_number || 'Call');
+
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [categoryTitles, setCategoryTitles] = useState({});
 
   useEffect(() => {
     setHeading(translations.categories_heading || 'Shop by');
     setHighlight(translations.categories_highlight || 'Category');
     setDescription(translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
+    setPhone(translations.phone_number || 'Call');
+
+    const titles = {};
+    categories.forEach(cat => {
+      titles[cat.id] = translations[`category_title_${cat.id}`] || cat.title;
+    });
+    setCategoryTitles(titles);
   }, [translations]);
 
   const handleHeadingBlur = () => {
@@ -29,6 +39,14 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
   const handleDescriptionBlur = () => {
     setEditingField(null);
     defaultInstance.post(`/translations/${language}`, { key: 'categories_description', value: description });
+  };
+
+  const handleCategoryTitleBlur = (id) => {
+    setEditingCategoryId(null);
+    defaultInstance.post(`/translations/${language}`, {
+      key: `category_title_${id}`,
+      value: categoryTitles[id]
+    });
   };
 
   const handleImageLoad = useCallback((id) => {
@@ -195,22 +213,66 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
               </div>
 
               {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                <h3 className="text-2xl font-bold mb-2">{category.title}</h3>
+              <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
+                <div className="flex items-center">
+                  {editingCategoryId === category.id ? (
+                    <input
+                      className="text-2xl font-bold mb-2 text-black w-full pr-8"
+                      value={categoryTitles[category.id] || ''}
+                      onChange={e =>
+                        setCategoryTitles(titles => ({
+                          ...titles,
+                          [category.id]: e.target.value
+                        }))
+                      }
+                      onBlur={() => handleCategoryTitleBlur(category.id)}
+                      autoFocus
+                      style={{ minWidth: 80 }}
+                    />
+                  ) : (
+                    <h3
+                      className="text-2xl font-bold mb-2 pr-8 cursor-pointer relative"
+                      onDoubleClick={() => setEditingCategoryId(category.id)}
+                      style={{ position: 'relative', display: 'inline-block' }}
+                    >
+                      {categoryTitles[category.id] || ''}
+                      <button
+                        type="button"
+                        onClick={() => setEditingCategoryId(category.id)}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit category title"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={16} className="text-gray-400 hover:text-[#FFDA1A]" />
+                      </button>
+                    </h3>
+                  )}
+                </div>
                 <div className="flex items-center space-x-2 text-[#FFDA1A] font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                  <span>Call Now</span>
-                  <Phone size={20} />
+                  <a
+                    href={phone ? `tel:${phone.replace(/[^+\d]/g, '')}` : '#'}
+                    className="flex items-center gap-2"
+                    onClick={e => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log('Call Now button clicked');
+                      window.location.href = phone ? `tel:${phone.replace(/[^+\d]/g, '')}` : '#';
+                    }}
+                  >
+                    <span>Call Now</span>
+                    <Phone size={20} />
+                  </a>
                 </div>
               </div>
 
               {/* Hover Effect */}
-              <div className="absolute inset-0 bg-[#0058A3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-[#0058A3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
             </div>
           ))}
         </div>
 
-      </div>
-    </section>
+      </div >
+    </section >
   );
 });
 

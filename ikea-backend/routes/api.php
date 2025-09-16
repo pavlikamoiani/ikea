@@ -23,3 +23,11 @@ Route::post('/translations/{lang}', [LanguageTranlationsController::class, 'save
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
+    $path = storage_path("app/{$folder}/{$filename}");
+    if (!file_exists($path)) {
+        abort(404);
+    }
+    return Response::file($path);
+});

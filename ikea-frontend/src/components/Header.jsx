@@ -31,11 +31,24 @@ const Header = memo(({ activeSection, onNavigate, language, setLanguage, transla
   const [editingNavIndex, setEditingNavIndex] = useState(null);
   const [editingPhone, setEditingPhone] = useState(false);
 
+  // Add editable brand state
+  const [editingBrand, setEditingBrand] = useState(false);
+  const [brand, setBrand] = useState(translations.header_brand || 'IKEA');
+
+  // Logo editing state
+  const [logoUrl, setLogoUrl] = useState(translations.header_logo_url || '');
+  const [editingLogo, setEditingLogo] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    setBrand(translations.header_brand || 'IKEA');
+    setLogoUrl(translations.header_logo_url || '');
+  }, [translations]);
 
   const toggleMenu = useCallback(() => {
     setIsMenuOpen(prev => !prev);
@@ -49,7 +62,6 @@ const Header = memo(({ activeSection, onNavigate, language, setLanguage, transla
     );
   };
 
-  // POST to /api/translations/{lang} on blur
   const handlePhoneBlur = () => {
     setEditingPhone(false);
     defaultInstance.post(`/translations/${language}`, { key: 'phone_number', value: phone });
@@ -61,6 +73,27 @@ const Header = memo(({ activeSection, onNavigate, language, setLanguage, transla
     defaultInstance.post(`/translations/${language}`, { key: keys[idx], value: navItems[idx].label });
   };
 
+  const handleBrandBlur = () => {
+    setEditingBrand(false);
+    defaultInstance.post(`/translations/${language}`, { key: 'header_brand', value: brand });
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('key', 'header_logo_url');
+      formData.append('file', file);
+
+      defaultInstance.post(`/translations/${language}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }).then(res => {
+        setLogoUrl(res.data.value);
+        setEditingLogo(false);
+      });
+    }
+  };
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}>
@@ -68,15 +101,70 @@ const Header = memo(({ activeSection, onNavigate, language, setLanguage, transla
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-12 h-12 bg-[#0058A3] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">IK</span>
+            <div className="w-12 h-12 bg-[#0058A3] rounded-lg flex items-center justify-center relative">
+              {editingLogo ? (
+                <>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    id="logo-upload-input"
+                    onChange={handleLogoChange}
+                  />
+                  <label htmlFor="logo-upload-input" className="w-full h-full flex items-center justify-center cursor-pointer">
+                    <span className="text-white font-bold text-xl">
+                      {logoUrl ? (
+                        <img src={logoUrl} alt="IK" className="w-10 h-10 object-contain" />
+                      ) : (
+                        ''
+                      )}
+                    </span>
+                  </label>
+                </>
+              ) : (
+                <span
+                  className="text-white font-bold text-xl cursor-pointer"
+                  onClick={() => setEditingLogo(true)}
+                  title="Click to edit logo"
+                >
+                  {logoUrl ? (
+                    <img src={logoUrl} alt="IK" className="w-10 h-10 object-contain" />
+                  ) : (
+                    ''
+                  )}
+                </span>
+              )}
             </div>
-            <span
-              className="text-2xl font-bold text-[#0058A3] pr-7 select-none"
-              style={{ display: 'inline-block' }}
-            >
-              IKEA
-            </span>
+            {/* Editable brand */}
+            <div className="relative">
+              {editingBrand ? (
+                <input
+                  className="text-2xl font-bold text-[#0058A3] pr-7 select-none bg-white border border-[#0058A3] rounded px-1 py-0.5 w-24 text-center"
+                  value={brand}
+                  onChange={e => setBrand(e.target.value)}
+                  onBlur={handleBrandBlur}
+                  autoFocus
+                  style={{ minWidth: 60 }}
+                />
+              ) : (
+                <span
+                  className="text-2xl font-bold text-[#0058A3] pr-7 select-none cursor-pointer"
+                  style={{ display: 'inline-block', position: 'relative' }}
+                  onDoubleClick={() => setEditingBrand(true)}
+                >
+                  {brand}
+                  <button
+                    type="button"
+                    onClick={() => setEditingBrand(true)}
+                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                    aria-label="Edit brand"
+                    tabIndex={-1}
+                  >
+                    <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                  </button>
+                </span>
+              )}
+            </div>
             <select
               className="ml-4 border border-[#0058A3] rounded px-2 py-1 text-[#0058A3] font-semibold bg-white"
               value={language}
