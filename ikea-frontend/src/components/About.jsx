@@ -1,6 +1,7 @@
 import React, { memo, useState, useCallback, useEffect } from 'react';
 import { Heart, Users, Leaf, Award, Pencil } from 'lucide-react';
 import defaultInstance from '../api/defaultInstance';
+import { useSelector } from 'react-redux';
 
 
 const About = memo(({ language = 'ka', translations = {} }) => {
@@ -28,6 +29,13 @@ const About = memo(({ language = 'ka', translations = {} }) => {
     label: translations.about_floating_label || 'Founded'
   });
 
+  // Editable image
+  const [editingImage, setEditingImage] = useState(false);
+  const [aboutImageUrl, setAboutImageUrl] = useState(translations.about_image_url || 'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800');
+
+  const user = useSelector(state => state.user.user);
+  const isAdmin = user?.role === 'admin';
+
   useEffect(() => {
     setHeading(translations.about_heading || '');
     setHighlight(translations.about_highlight || 'IKEA');
@@ -42,6 +50,7 @@ const About = memo(({ language = 'ka', translations = {} }) => {
       value: translations.about_floating_value || '1943',
       label: translations.about_floating_label || 'Founded'
     });
+    setAboutImageUrl(translations.about_image_url || 'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800');
   }, [translations]);
 
   const handleImageLoad = useCallback(() => {
@@ -54,6 +63,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
         i === idx ? { ...stat, [field]: value } : stat
       )
     );
+  };
+
+  const handleAboutImageChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('key', 'about_image_url');
+      formData.append('file', file);
+      defaultInstance.post(`/translations/${language}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }).then(res => {
+        setAboutImageUrl(res.data.value);
+        setEditingImage(false);
+      });
+    }
   };
 
   // Save handlers for each field
@@ -125,19 +149,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                 ) : (
                   <span
                     className="text-4xl sm:text-5xl font-bold text-gray-900 pr-8 cursor-pointer"
-                    onDoubleClick={() => setEditingField('heading')}
+                    onDoubleClick={isAdmin ? () => setEditingField('heading') : undefined}
                     style={{ position: 'relative' }}
                   >
                     {heading}
-                    <button
-                      type="button"
-                      onClick={() => setEditingField('heading')}
-                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                      aria-label="Edit heading"
-                      tabIndex={-1}
-                    >
-                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingField('heading')}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit heading"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                      </button>
+                    )}
                   </span>
                 )}
                 {' '}
@@ -153,19 +179,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                 ) : (
                   <span
                     className="text-[#0058A3] text-4xl sm:text-5xl font-bold pr-8 cursor-pointer"
-                    onDoubleClick={() => setEditingField('highlight')}
+                    onDoubleClick={isAdmin ? () => setEditingField('highlight') : undefined}
                     style={{ position: 'relative' }}
                   >
                     {highlight}
-                    <button
-                      type="button"
-                      onClick={() => setEditingField('highlight')}
-                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                      aria-label="Edit highlight"
-                      tabIndex={-1}
-                    >
-                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingField('highlight')}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit highlight"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                      </button>
+                    )}
                   </span>
                 )}
               </div>
@@ -182,19 +210,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                 ) : (
                   <p
                     className="text-xl text-gray-600 mb-2 leading-relaxed pr-8 cursor-pointer relative"
-                    onDoubleClick={() => setEditingField('paragraph1')}
+                    onDoubleClick={isAdmin ? () => setEditingField('paragraph1') : undefined}
                     style={{ display: 'inline-block', position: 'relative' }}
                   >
                     {paragraph1}
-                    <button
-                      type="button"
-                      onClick={() => setEditingField('paragraph1')}
-                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                      aria-label="Edit paragraph1"
-                      tabIndex={-1}
-                    >
-                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingField('paragraph1')}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit paragraph1"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                      </button>
+                    )}
                   </p>
                 )}
               </div>
@@ -211,19 +241,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                 ) : (
                   <p
                     className="text-lg text-gray-600 mb-8 pr-8 cursor-pointer relative"
-                    onDoubleClick={() => setEditingField('paragraph2')}
+                    onDoubleClick={isAdmin ? () => setEditingField('paragraph2') : undefined}
                     style={{ display: 'inline-block', position: 'relative' }}
                   >
                     {paragraph2}
-                    <button
-                      type="button"
-                      onClick={() => setEditingField('paragraph2')}
-                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                      aria-label="Edit paragraph2"
-                      tabIndex={-1}
-                    >
-                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingField('paragraph2')}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit paragraph2"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                      </button>
+                    )}
                   </p>
                 )}
               </div>
@@ -245,19 +277,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                     ) : (
                       <span
                         className="text-3xl font-bold text-[#0058A3] pr-8 cursor-pointer relative"
-                        onDoubleClick={() => setEditingStat({ index: idx, field: 'value' })}
+                        onDoubleClick={isAdmin ? () => setEditingStat({ index: idx, field: 'value' }) : undefined}
                         style={{ display: 'inline-block', position: 'relative' }}
                       >
                         {stat.value}
-                        <button
-                          type="button"
-                          onClick={() => setEditingStat({ index: idx, field: 'value' })}
-                          className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                          aria-label="Edit stat value"
-                          tabIndex={-1}
-                        >
-                          <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" />
-                        </button>
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => setEditingStat({ index: idx, field: 'value' })}
+                            className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                            aria-label="Edit stat value"
+                            tabIndex={-1}
+                          >
+                            <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" />
+                          </button>
+                        )}
                       </span>
                     )}
                   </div>
@@ -274,19 +308,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                     ) : (
                       <span
                         className="text-sm text-gray-600 pr-8 cursor-pointer relative"
-                        onDoubleClick={() => setEditingStat({ index: idx, field: 'label' })}
+                        onDoubleClick={isAdmin ? () => setEditingStat({ index: idx, field: 'label' }) : undefined}
                         style={{ display: 'inline-block', position: 'relative' }}
                       >
                         {stat.label}
-                        <button
-                          type="button"
-                          onClick={() => setEditingStat({ index: idx, field: 'label' })}
-                          className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                          aria-label="Edit stat label"
-                          tabIndex={-1}
-                        >
-                          <Pencil size={12} className="text-gray-400 hover:text-[#0058A3]" />
-                        </button>
+                        {isAdmin && (
+                          <button
+                            type="button"
+                            onClick={() => setEditingStat({ index: idx, field: 'label' })}
+                            className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                            aria-label="Edit stat label"
+                            tabIndex={-1}
+                          >
+                            <Pencil size={12} className="text-gray-400 hover:text-[#0058A3]" />
+                          </button>
+                        )}
                       </span>
                     )}
                   </div>
@@ -303,15 +339,61 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                   <div className="text-gray-400">Loading...</div>
                 </div>
               )}
-              <img
-                src="https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800"
-                alt="IKEA Store Interior"
-                className={`w-full h-96 object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'
-                  }`}
-                loading="lazy"
-                decoding="async"
-                onLoad={handleImageLoad}
-              />
+              {editingImage ? (
+                <div className="relative w-full h-96 flex items-center justify-center">
+                  {/* Always show the image */}
+                  <img
+                    src={aboutImageUrl}
+                    alt="IKEA Store Interior"
+                    className="w-full h-96 object-cover opacity-60 pointer-events-none"
+                  />
+                  {/* Overlay for controls */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center z-20 bg-black/30">
+                    <label
+                      htmlFor="about-image-upload"
+                      className="mt-4 px-4 py-2 bg-white text-[#0058A3] font-semibold rounded shadow cursor-pointer"
+                      style={{ zIndex: 30 }}
+                    >
+                      Select Image
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      id="about-image-upload"
+                      style={{ display: 'none' }}
+                      onChange={handleAboutImageChange}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setEditingImage(false)}
+                      className="mt-2 px-4 py-1 bg-gray-200 text-gray-700 rounded"
+                      aria-label="Cancel image edit"
+                    >Cancel</button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <img
+                    src={aboutImageUrl}
+                    alt="IKEA Store Interior"
+                    className={`w-full h-96 object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={handleImageLoad}
+                  />
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingImage(true)}
+                      className="absolute top-2 right-2 bg-white/80 rounded-full p-1 z-30"
+                      aria-label="Edit about image"
+                      title="Edit about image"
+                    >
+                      <Pencil size={16} className="text-[#0058A3]" />
+                    </button>
+                  )}
+                </>
+              )}
             </div>
             {/* Floating card */}
             <div className="absolute -bottom-6 -left-6 bg-[#FFDA1A] p-6 rounded-xl shadow-xl">
@@ -328,19 +410,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                 ) : (
                   <span
                     className="text-2xl font-bold text-[#0058A3] pr-8 cursor-pointer relative"
-                    onDoubleClick={() => setEditingFloating('value')}
+                    onDoubleClick={isAdmin ? () => setEditingFloating('value') : undefined}
                     style={{ display: 'inline-block', position: 'relative' }}
                   >
                     {floating.value}
-                    <button
-                      type="button"
-                      onClick={() => setEditingFloating('value')}
-                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                      aria-label="Edit floating value"
-                      tabIndex={-1}
-                    >
-                      <Pencil size={14} className="text-[#0058A3] hover:text-black" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingFloating('value')}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit floating value"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={14} className="text-[#0058A3] hover:text-black" />
+                      </button>
+                    )}
                   </span>
                 )}
               </div>
@@ -357,19 +441,21 @@ const About = memo(({ language = 'ka', translations = {} }) => {
                 ) : (
                   <span
                     className="text-sm text-[#0058A3] font-semibold pr-8 cursor-pointer relative"
-                    onDoubleClick={() => setEditingFloating('label')}
+                    onDoubleClick={isAdmin ? () => setEditingFloating('label') : undefined}
                     style={{ display: 'inline-block', position: 'relative' }}
                   >
                     {floating.label}
-                    <button
-                      type="button"
-                      onClick={() => setEditingFloating('label')}
-                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                      aria-label="Edit floating label"
-                      tabIndex={-1}
-                    >
-                      <Pencil size={12} className="text-[#0058A3] hover:text-black" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingFloating('label')}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit floating label"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={12} className="text-[#0058A3] hover:text-black" />
+                      </button>
+                    )}
                   </span>
                 )}
               </div>

@@ -1,6 +1,7 @@
 import React, { memo, useState, useEffect } from 'react';
 import { MapPin, Phone, Clock, Pencil } from 'lucide-react';
 import defaultInstance from '../api/defaultInstance';
+import { useSelector } from 'react-redux';
 
 
 const Contact = memo(({ language = 'ka', translations = {} }) => {
@@ -13,6 +14,9 @@ const Contact = memo(({ language = 'ka', translations = {} }) => {
     { icon: <Phone className="w-6 h-6" />, title: translations.contact_1_title || 'Call Us', details: translations.contact_1_details || '+1 (123) 456-7890', link: translations.contact_1_link || 'Call Now' },
     { icon: <Clock className="w-6 h-6" />, title: translations.contact_2_title || 'Store Hours', details: translations.contact_2_details || 'Mon-Sat: 10am - 9pm', link: translations.contact_2_link || 'View Hours' }
   ]);
+
+  const user = useSelector(state => state.user.user);
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     setHeading(translations.contact_heading || 'Get in');
@@ -74,19 +78,21 @@ const Contact = memo(({ language = 'ka', translations = {} }) => {
               ) : (
                 <span
                   className="text-4xl sm:text-5xl font-bold text-gray-900 pr-8 cursor-pointer"
-                  onDoubleClick={() => setEditingField('heading')}
+                  onDoubleClick={isAdmin ? () => setEditingField('heading') : undefined}
                   style={{ position: 'relative' }}
                 >
                   {heading}
-                  <button
-                    type="button"
-                    onClick={() => setEditingField('heading')}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                    aria-label="Edit heading"
-                    tabIndex={-1}
-                  >
-                    <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingField('heading')}
+                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                      aria-label="Edit heading"
+                      tabIndex={-1}
+                    >
+                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                    </button>
+                  )}
                 </span>
               )}
               {' '}
@@ -102,19 +108,21 @@ const Contact = memo(({ language = 'ka', translations = {} }) => {
               ) : (
                 <span
                   className="text-[#0058A3] text-4xl sm:text-5xl font-bold pr-8 cursor-pointer"
-                  onDoubleClick={() => setEditingField('highlight')}
+                  onDoubleClick={isAdmin ? () => setEditingField('highlight') : undefined}
                   style={{ position: 'relative' }}
                 >
                   {highlight}
-                  <button
-                    type="button"
-                    onClick={() => setEditingField('highlight')}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                    aria-label="Edit highlight"
-                    tabIndex={-1}
-                  >
-                    <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingField('highlight')}
+                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                      aria-label="Edit highlight"
+                      tabIndex={-1}
+                    >
+                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                    </button>
+                  )}
                 </span>
               )}
             </div>
@@ -131,19 +139,21 @@ const Contact = memo(({ language = 'ka', translations = {} }) => {
               ) : (
                 <p
                   className="text-xl text-gray-600 max-w-2xl mx-auto pr-8 cursor-pointer relative"
-                  onDoubleClick={() => setEditingField('subtitle')}
+                  onDoubleClick={isAdmin ? () => setEditingField('subtitle') : undefined}
                   style={{ display: 'inline-block', position: 'relative' }}
                 >
                   {subtitle}
-                  <button
-                    type="button"
-                    onClick={() => setEditingField('subtitle')}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                    aria-label="Edit subtitle"
-                    tabIndex={-1}
-                  >
-                    <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingField('subtitle')}
+                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                      aria-label="Edit subtitle"
+                      tabIndex={-1}
+                    >
+                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                    </button>
+                  )}
                 </p>
               )}
             </div>
@@ -174,19 +184,21 @@ const Contact = memo(({ language = 'ka', translations = {} }) => {
                       ) : (
                         <h4
                           className="font-semibold text-gray-900 pr-8 cursor-pointer relative"
-                          onDoubleClick={() => setEditingContact({ index, field: 'title' })}
+                          onDoubleClick={isAdmin ? () => setEditingContact({ index, field: 'title' }) : undefined}
                           style={{ display: 'inline-block', position: 'relative' }}
                         >
                           {info.title}
-                          <button
-                            type="button"
-                            onClick={() => setEditingContact({ index, field: 'title' })}
-                            className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                            aria-label="Edit title"
-                            tabIndex={-1}
-                          >
-                            <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" />
-                          </button>
+                          {isAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => setEditingContact({ index, field: 'title' })}
+                              className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                              aria-label="Edit title"
+                              tabIndex={-1}
+                            >
+                              <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" />
+                            </button>
+                          )}
                         </h4>
                       )}
                     </div>
@@ -202,19 +214,21 @@ const Contact = memo(({ language = 'ka', translations = {} }) => {
                       ) : (
                         <p
                           className="text-gray-600 pr-8 cursor-pointer relative"
-                          onDoubleClick={() => setEditingContact({ index, field: 'details' })}
+                          onDoubleClick={isAdmin ? () => setEditingContact({ index, field: 'details' }) : undefined}
                           style={{ display: 'inline-block', position: 'relative' }}
                         >
                           {info.details}
-                          <button
-                            type="button"
-                            onClick={() => setEditingContact({ index, field: 'details' })}
-                            className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                            aria-label="Edit details"
-                            tabIndex={-1}
-                          >
-                            <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" />
-                          </button>
+                          {isAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => setEditingContact({ index, field: 'details' })}
+                              className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                              aria-label="Edit details"
+                              tabIndex={-1}
+                            >
+                              <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" />
+                            </button>
+                          )}
                         </p>
                       )}
                     </div>
@@ -230,14 +244,16 @@ const Contact = memo(({ language = 'ka', translations = {} }) => {
                       ) : (
                         <button
                           className="text-[#0058A3] hover:text-[#004494] font-medium text-sm transition-colors duration-200 pr-8 cursor-pointer relative"
-                          onDoubleClick={() => setEditingContact({ index, field: 'link' })}
+                          onDoubleClick={isAdmin ? () => setEditingContact({ index, field: 'link' }) : undefined}
                           style={{ display: 'inline-block', position: 'relative' }}
                           type="button"
                         >
                           {info.link} →
-                          <span className="absolute top-1/2 -translate-y-1/2 right-0 p-1">
-                            <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" onClick={e => { e.stopPropagation(); setEditingContact({ index, field: 'link' }); }} tabIndex={-1} />
-                          </span>
+                          {isAdmin && (
+                            <span className="absolute top-1/2 -translate-y-1/2 right-0 p-1">
+                              <Pencil size={14} className="text-gray-400 hover:text-[#0058A3]" onClick={e => { e.stopPropagation(); setEditingContact({ index, field: 'link' }); }} tabIndex={-1} />
+                            </span>
+                          )}
                         </button>
                       )}
                     </div>

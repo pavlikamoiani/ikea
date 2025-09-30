@@ -1,5 +1,6 @@
 import React, { memo, useCallback, useState, useEffect } from 'react';
 import { Facebook, Twitter, Instagram, Youtube, ArrowUp, Pencil } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
   const scrollToTop = useCallback(() => {
@@ -10,6 +11,9 @@ const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
   const [editingField, setEditingField] = useState(null);
   const [brand, setBrand] = useState(translations.footer_brand || 'IKEA');
   const [description, setDescription] = useState(translations.footer_description || 'Creating a better everyday life for the many people by offering well-designed, functional home furnishing solutions.');
+
+  const user = useSelector(state => state.user.user);
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     setBrand(translations.footer_brand || 'IKEA');
@@ -55,19 +59,21 @@ const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
                 ) : (
                   <span
                     className="text-2xl font-bold pr-7 cursor-pointer"
-                    onDoubleClick={() => setEditingField('brand')}
+                    onDoubleClick={isAdmin ? () => setEditingField('brand') : undefined}
                     style={{ position: 'relative', display: 'inline-block' }}
                   >
                     {brand}
-                    <button
-                      type="button"
-                      onClick={() => setEditingField('brand')}
-                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                      aria-label="Edit brand"
-                      tabIndex={-1}
-                    >
-                      <Pencil size={16} className="text-[#FFDA1A] hover:text-white" />
-                    </button>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setEditingField('brand')}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                        aria-label="Edit brand"
+                        tabIndex={-1}
+                      >
+                        <Pencil size={16} className="text-[#FFDA1A] hover:text-white" />
+                      </button>
+                    )}
                   </span>
                 )}
               </div>
@@ -85,19 +91,21 @@ const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
               ) : (
                 <p
                   className="text-blue-100 mb-6 leading-relaxed pr-8 cursor-pointer relative"
-                  onDoubleClick={() => setEditingField('description')}
+                  onDoubleClick={isAdmin ? () => setEditingField('description') : undefined}
                   style={{ display: 'inline-block', position: 'relative' }}
                 >
                   {description}
-                  <button
-                    type="button"
-                    onClick={() => setEditingField('description')}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                    aria-label="Edit description"
-                    tabIndex={-1}
-                  >
-                    <Pencil size={16} className="text-[#FFDA1A] hover:text-white" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingField('description')}
+                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                      aria-label="Edit description"
+                      tabIndex={-1}
+                    >
+                      <Pencil size={16} className="text-[#FFDA1A] hover:text-white" />
+                    </button>
+                  )}
                 </p>
               )}
             </div>

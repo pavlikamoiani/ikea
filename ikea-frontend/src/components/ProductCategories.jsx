@@ -1,6 +1,7 @@
 import React, { memo, useState, useCallback, useEffect } from 'react';
 import { Phone, Pencil } from 'lucide-react';
 import defaultInstance from '../api/defaultInstance';
+import { useSelector } from 'react-redux';
 
 
 const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
@@ -14,6 +15,11 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
 
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [categoryTitles, setCategoryTitles] = useState({});
+  const [categoryImages, setCategoryImages] = useState({});
+  const [editingImageId, setEditingImageId] = useState(null);
+
+  const user = useSelector(state => state.user.user);
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     setHeading(translations.categories_heading || 'Shop by');
@@ -26,6 +32,13 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
       titles[cat.id] = translations[`category_title_${cat.id}`] || cat.title;
     });
     setCategoryTitles(titles);
+
+    // Load category images from translations or fallback to default
+    const images = {};
+    categories.forEach(cat => {
+      images[cat.id] = translations[`category_image_${cat.id}`] || cat.image;
+    });
+    setCategoryImages(images);
   }, [translations]);
 
   const handleHeadingBlur = () => {
@@ -52,6 +65,26 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
   const handleImageLoad = useCallback((id) => {
     setLoadedImages(prev => new Set(prev).add(id));
   }, []);
+
+  // Handle image upload
+  const handleCategoryImageChange = (id, e) => {
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('key', `category_image_${id}`);
+      formData.append('file', file);
+
+      defaultInstance.post(`/translations/${language}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      }).then(res => {
+        setCategoryImages(imgs => ({
+          ...imgs,
+          [id]: res.data.value
+        }));
+        setEditingImageId(null);
+      });
+    }
+  };
 
   const categories = [
     {
@@ -110,19 +143,21 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
               ) : (
                 <span
                   className="text-4xl sm:text-5xl font-bold text-gray-900 pr-8 cursor-pointer"
-                  onDoubleClick={() => setEditingField('heading')}
+                  onDoubleClick={isAdmin ? () => setEditingField('heading') : undefined}
                   style={{ position: 'relative' }}
                 >
                   {heading}
-                  <button
-                    type="button"
-                    onClick={() => setEditingField('heading')}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                    aria-label="Edit heading"
-                    tabIndex={-1}
-                  >
-                    <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingField('heading')}
+                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                      aria-label="Edit heading"
+                      tabIndex={-1}
+                    >
+                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                    </button>
+                  )}
                 </span>
               )}
               {' '}
@@ -138,19 +173,22 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
               ) : (
                 <span
                   className="text-[#0058A3] text-4xl sm:text-5xl font-bold pr-8 cursor-pointer"
-                  onDoubleClick={() => setEditingField('highlight')}
+                  onDoubleClick={isAdmin ? () => setEditingField('highlight') : undefined}
                   style={{ position: 'relative' }}
                 >
                   {highlight}
-                  <button
-                    type="button"
-                    onClick={() => setEditingField('highlight')}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                    aria-label="Edit highlight"
-                    tabIndex={-1}
-                  >
-                    <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                  </button>
+
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingField('highlight')}
+                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                      aria-label="Edit highlight"
+                      tabIndex={-1}
+                    >
+                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                    </button>
+                  )}
                 </span>
               )}
             </div>
@@ -167,19 +205,21 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
               ) : (
                 <p
                   className="text-xl text-gray-600 max-w-2xl mx-auto pr-8 cursor-pointer relative"
-                  onDoubleClick={() => setEditingField('description')}
+                  onDoubleClick={isAdmin ? () => setEditingField('description') : undefined}
                   style={{ display: 'inline-block', position: 'relative' }}
                 >
                   {description}
-                  <button
-                    type="button"
-                    onClick={() => setEditingField('description')}
-                    className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                    aria-label="Edit description"
-                    tabIndex={-1}
-                  >
-                    <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
-                  </button>
+                  {isAdmin && (
+                    <button
+                      type="button"
+                      onClick={() => setEditingField('description')}
+                      className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                      aria-label="Edit description"
+                      tabIndex={-1}
+                    >
+                      <Pencil size={16} className="text-gray-400 hover:text-[#0058A3]" />
+                    </button>
+                  )}
                 </p>
               )}
             </div>
@@ -200,15 +240,61 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
                     <div className="text-gray-400">Loading...</div>
                   </div>
                 )}
-                <img
-                  src={category.image}
-                  alt={category.title}
-                  className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ${loadedImages.has(category.id) ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  loading="lazy"
-                  decoding="async"
-                  onLoad={() => handleImageLoad(category.id)}
-                />
+                {editingImageId === category.id ? (
+                  <>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      id={`category-image-upload-${category.id}`}
+                      onChange={e => handleCategoryImageChange(category.id, e)}
+                    />
+                    <label
+                      htmlFor={`category-image-upload-${category.id}`}
+                      className="absolute inset-0 flex items-center justify-center cursor-pointer z-20 bg-black/30"
+                    >
+                      <img
+                        src={categoryImages[category.id] || category.image}
+                        alt={category.title}
+                        className="w-full h-full object-cover opacity-60"
+                        style={{ pointerEvents: 'none' }}
+                      />
+                      <span className="absolute inset-0 flex items-center justify-center text-white text-lg font-bold bg-black/40">Select Image</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setEditingImageId(null)}
+                      className="absolute top-2 right-2 bg-white/80 rounded-full p-1 z-30"
+                      aria-label="Cancel image edit"
+                    >×</button>
+                  </>
+                ) : (
+                  <>
+                    <img
+                      src={categoryImages[category.id] || category.image}
+                      alt={category.title}
+                      className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ${loadedImages.has(category.id) ? 'opacity-100' : 'opacity-0'
+                        }`}
+                      loading="lazy"
+                      decoding="async"
+                      onLoad={() => handleImageLoad(category.id)}
+                    />
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={isAdmin ? e => {
+                          e.stopPropagation();
+                          setEditingImageId(category.id);
+                        } : undefined}
+                        className="absolute top-2 right-2 bg-white/80 rounded-full p-1 z-30"
+                        aria-label="Edit category image"
+                        title="Edit category image"
+                      >
+                        <Pencil size={16} className="text-[#0058A3]" />
+                      </button>
+                    )}
+                  </>
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               </div>
 
@@ -232,19 +318,20 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
                   ) : (
                     <h3
                       className="text-2xl font-bold mb-2 pr-8 cursor-pointer relative"
-                      onDoubleClick={() => setEditingCategoryId(category.id)}
+                      onDoubleClick={isAdmin ? () => setEditingCategoryId(category.id) : undefined}
                       style={{ position: 'relative', display: 'inline-block' }}
                     >
                       {categoryTitles[category.id] || ''}
-                      <button
-                        type="button"
-                        onClick={() => setEditingCategoryId(category.id)}
-                        className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
-                        aria-label="Edit category title"
-                        tabIndex={-1}
-                      >
-                        <Pencil size={16} className="text-gray-400 hover:text-[#FFDA1A]" />
-                      </button>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingCategoryId(category.id)}
+                          className="absolute top-1/2 -translate-y-1/2 right-0 p-1"
+                          aria-label="Edit category title"
+                        >
+                          <Pencil size={16} className="text-gray-400 hover:text-[#FFDA1A]" />
+                        </button>
+                      )}
                     </h3>
                   )}
                 </div>
@@ -266,7 +353,7 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
               </div>
 
               {/* Hover Effect */}
-              <div className="absolute inset-0 bg-[#0058A3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
+              <div div className="absolute inset-0 bg-[#0058A3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0" ></div>
             </div>
           ))}
         </div>

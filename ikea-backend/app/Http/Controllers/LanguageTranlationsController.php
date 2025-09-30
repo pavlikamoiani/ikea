@@ -27,9 +27,11 @@ class LanguageTranlationsController extends Controller
 
     public function save(Request $request, $lang)
     {
-        if ($request->hasFile('file') && $request->input('key') === 'header_logo_url') {
+        if ($request->hasFile('file')) {
+            $key = $request->input('key');
             $model = (new LanguageTranlations())->setLanguage($lang);
-            $old = $model->where('key', 'header_logo_url')->first();
+
+            $old = $model->where('key', $key)->first();
             if ($old && !empty($old->value)) {
                 $parsed = parse_url($old->value, PHP_URL_PATH);
                 if ($parsed) {
@@ -42,12 +44,16 @@ class LanguageTranlationsController extends Controller
             }
 
             $file = $request->file('file');
-            $filename = uniqid('logo_') . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs('public/logos', $filename);
-            $url = url('/storage/logos/' . $filename);
+            $folder = 'logos';
+            if (str_starts_with($key, 'category_image_')) {
+                $folder = 'categories';
+            }
+            $filename = uniqid($folder . '_') . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('public/' . $folder, $filename);
+            $url = url('/storage/' . $folder . '/' . $filename);
 
             $translation = $model->updateOrCreate(
-                ['key' => 'header_logo_url'],
+                ['key' => $key],
                 ['value' => $url]
             );
             return response()->json($translation);

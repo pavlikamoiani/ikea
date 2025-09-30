@@ -16,9 +16,12 @@ use Illuminate\Support\Facades\Route;
 
 
 use App\Http\Controllers\LanguageTranlationsController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/translations/{lang}', [LanguageTranlationsController::class, 'index']);
 Route::post('/translations/{lang}', [LanguageTranlationsController::class, 'save']);
+
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route, useParams, useNavigate, Navigate } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import store from './store';
 import Header from './components/Header.jsx';
 import Hero from './components/Hero.jsx';
 import ProductCategories from './components/ProductCategories.jsx';
@@ -7,6 +9,7 @@ import About from './components/About.jsx';
 import Contact from './components/Contact.jsx';
 import Footer from './components/Footer.jsx';
 import defaultInstance from './api/defaultInstance';
+import Login from './components/Login.jsx';
 
 const SUPPORTED_LANGS = ['ka', 'ru', 'am'];
 
@@ -97,12 +100,15 @@ function MainApp() {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Navigate to="/ka" replace />} />
-        <Route path="/:lang" element={<MainApp />} />
-      </Routes>
-    </Router>
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Navigate to="/ka" replace />} />
+          <Route path="/:lang" element={<MainApp />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Router>
+    </Provider>
   );
 }
 
