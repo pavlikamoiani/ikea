@@ -3,21 +3,18 @@ import { Phone, Pencil } from 'lucide-react';
 import defaultInstance from '../api/defaultInstance';
 import { useSelector } from 'react-redux';
 
-
 const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
   const [loadedImages, setLoadedImages] = useState(new Set());
-
   const [editingField, setEditingField] = useState(null);
   const [heading, setHeading] = useState(translations.categories_heading === null ? '' : translations.categories_heading || 'Shop by');
   const [highlight, setHighlight] = useState(translations.categories_highlight === null ? '' : translations.categories_highlight || 'Category');
   const [description, setDescription] = useState(translations.categories_description === null ? '' : translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
   const [phone, setPhone] = useState(translations.phone_number === null ? '' : translations.phone_number || 'Call');
-
+  const [callNowText, setCallNowText] = useState(translations.call_now_text === null ? '' : translations.call_now_text || 'Call Now');
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [categoryTitles, setCategoryTitles] = useState({});
   const [categoryImages, setCategoryImages] = useState({});
   const [editingImageId, setEditingImageId] = useState(null);
-
   const user = useSelector(state => state.user.user);
   const isAdmin = user?.role === 'admin';
 
@@ -26,14 +23,12 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
     setHighlight(translations.categories_highlight === null ? '' : translations.categories_highlight || 'Category');
     setDescription(translations.categories_description === null ? '' : translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
     setPhone(translations.phone_number === null ? '' : translations.phone_number || 'Call');
-
+    setCallNowText(translations.call_now_text === null ? '' : translations.call_now_text || 'Call Now');
     const titles = {};
     categories.forEach(cat => {
       titles[cat.id] = translations[`category_title_${cat.id}`] === null ? '' : translations[`category_title_${cat.id}`] || cat.title;
     });
     setCategoryTitles(titles);
-
-    // Load category images from translations or fallback to default
     const images = {};
     categories.forEach(cat => {
       images[cat.id] = translations[`category_image_${cat.id}`] === null ? '' : translations[`category_image_${cat.id}`] || cat.image;
@@ -41,17 +36,29 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
     setCategoryImages(images);
   }, [translations]);
 
+  const handlePhoneBlur = () => {
+    setEditingField(null);
+    defaultInstance.post(`/translations/${language}`, { key: 'phone_number', value: phone });
+  };
+
   const handleHeadingBlur = () => {
     setEditingField(null);
     defaultInstance.post(`/translations/${language}`, { key: 'categories_heading', value: heading });
   };
+
   const handleHighlightBlur = () => {
     setEditingField(null);
     defaultInstance.post(`/translations/${language}`, { key: 'categories_highlight', value: highlight });
   };
+
   const handleDescriptionBlur = () => {
     setEditingField(null);
     defaultInstance.post(`/translations/${language}`, { key: 'categories_description', value: description });
+  };
+
+  const handleCallNowTextBlur = () => {
+    setEditingField(null);
+    defaultInstance.post(`/translations/${language}`, { key: 'call_now_text', value: callNowText });
   };
 
   const handleCategoryTitleBlur = (id) => {
@@ -66,14 +73,12 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
     setLoadedImages(prev => new Set(prev).add(id));
   }, []);
 
-  // Handle image upload
   const handleCategoryImageChange = (id, e) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
       const formData = new FormData();
       formData.append('key', `category_image_${id}`);
       formData.append('file', file);
-
       defaultInstance.post(`/translations/${language}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       }).then(res => {
@@ -177,7 +182,6 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
                   style={{ position: 'relative' }}
                 >
                   {highlight}
-
                   {isAdmin && (
                     <button
                       type="button"
@@ -225,7 +229,6 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
             </div>
           </div>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((category) => (
             <div
@@ -297,7 +300,6 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
               </div>
-
               {/* Content */}
               <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
                 <div className="flex items-center">
@@ -336,33 +338,48 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
                   )}
                 </div>
                 <div className="flex items-center space-x-2 text-[#FFDA1A] font-semibold group-hover:translate-x-2 transition-transform duration-300">
-                  <a
-                    href={phone ? `tel:${phone.replace(/[^+\d]/g, '')}` : '#'}
-                    className="flex items-center gap-2"
-                    onClick={e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      console.log('Call Now button clicked');
-                      window.location.href = phone ? `tel:${phone.replace(/[^+\d]/g, '')}` : '#';
-                    }}
-                  >
-                    <span>Call Now</span>
-                    <Phone size={20} />
-                  </a>
+                  {editingField === `call_now_${category.id}` ? (
+                    <input
+                      className="text-black font-semibold w-full pr-8"
+                      value={callNowText}
+                      onChange={e => setCallNowText(e.target.value)}
+                      onBlur={handleCallNowTextBlur}
+                      autoFocus
+                      style={{ minWidth: 80 }}
+                    />
+                  ) : (
+                    <a
+                      className="flex items-center gap-2"
+                      onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('Call Now button clicked');
+                      }}
+                    >
+                      <span>{callNowText}</span>
+                      <Phone size={20} />
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingField(`call_now_${category.id}`)}
+                          className=""
+                          aria-label="Edit call now text"
+                        >
+                          <Pencil size={16} className="text-gray-400 hover:text-[#FFDA1A]" />
+                        </button>
+                      )}
+                    </a>
+                  )}
                 </div>
               </div>
-
-              {/* Hover Effect */}
-              <div div className="absolute inset-0 bg-[#0058A3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0" ></div>
+              <div className="absolute inset-0 bg-[#0058A3]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"></div>
             </div>
           ))}
         </div>
-
-      </div >
-    </section >
+      </div>
+    </section>
   );
 });
 
 ProductCategories.displayName = 'ProductCategories';
-
 export default ProductCategories;
