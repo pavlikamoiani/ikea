@@ -5,24 +5,24 @@ import { useSelector } from 'react-redux';
 
 const Hero = memo(({ language, translations = {} }) => {
   const [editingField, setEditingField] = useState(null);
-  const [heading, setHeading] = useState(translations.hero_heading || 'Create Your');
-  const [highlight, setHighlight] = useState(translations.hero_highlight || 'Perfect Home');
-  const [description, setDescription] = useState(translations.hero_description || 'Discover affordable, functional, and beautiful furniture solutions for every room in your home');
-  const [phone, setPhone] = useState(translations.phone_number || 'Call');
+  const [heading, setHeading] = useState(translations.hero_heading === null ? '' : translations.hero_heading || 'Create Your');
+  const [highlight, setHighlight] = useState(translations.hero_highlight === null ? '' : translations.hero_highlight || 'Perfect Home');
+  const [description, setDescription] = useState(translations.hero_description === null ? '' : translations.hero_description || 'Discover affordable, functional, and beautiful furniture solutions for every room in your home');
+  const [phone, setPhone] = useState(translations.phone_number === null ? '' : translations.phone_number || 'Call');
   const [editingPhone, setEditingPhone] = useState(false);
 
-  const [bgImageUrl, setBgImageUrl] = useState(translations.hero_bg_url || 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg');
+  const [bgImageUrl, setBgImageUrl] = useState(translations.hero_bg_url === null ? '' : translations.hero_bg_url || 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg');
   const [editingBgImage, setEditingBgImage] = useState(false);
 
   const user = useSelector(state => state.user.user);
   const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
-    setHeading(translations.hero_heading || 'Create Your');
-    setHighlight(translations.hero_highlight || 'Perfect Home');
-    setDescription(translations.hero_description || 'Discover affordable, functional, and beautiful furniture solutions for every room in your home');
-    setPhone(translations.phone_number || 'Call');
-    setBgImageUrl(translations.hero_bg_url || 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg');
+    setHeading(translations.hero_heading === null ? '' : translations.hero_heading || 'Create Your');
+    setHighlight(translations.hero_highlight === null ? '' : translations.hero_highlight || 'Perfect Home');
+    setDescription(translations.hero_description === null ? '' : translations.hero_description || 'Discover affordable, functional, and beautiful furniture solutions for every room in your home');
+    setPhone(translations.phone_number === null ? '' : translations.phone_number || 'Call');
+    setBgImageUrl(translations.hero_bg_url === null ? '' : translations.hero_bg_url || 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg');
   }, [translations]);
 
   const handleHeadingBlur = () => {

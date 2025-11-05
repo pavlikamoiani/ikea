@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import defaultInstance from '../api/defaultInstance';
 
 const LANGUAGES = [
-  { code: 'ka', flag: 'GE', label: 'KA' },
+  // { code: 'ka', flag: 'GE', label: 'KA' },
   { code: 'ru', flag: 'RU', label: 'RU' },
   { code: 'am', flag: 'AM', label: 'AM' }
   // Add 'en' if needed: { code: 'en', flag: 'GB', label: 'EN' },
@@ -15,28 +15,28 @@ const Header = memo(({ activeSection, onNavigate, language, setLanguage, transla
   const [isScrolled, setIsScrolled] = useState(false);
 
   const [navItems, setNavItems] = useState([
-    { id: 'home', label: translations.header_nav_home || 'Home' },
-    { id: 'about', label: translations.header_nav_about || 'About' },
-    { id: 'contact', label: translations.header_nav_contact || 'Contact' }
+    { id: 'home', label: (translations.header_nav_home === null ? '' : translations.header_nav_home) || 'Home' },
+    { id: 'about', label: (translations.header_nav_about === null ? '' : translations.header_nav_about) || 'About' },
+    { id: 'contact', label: (translations.header_nav_contact === null ? '' : translations.header_nav_contact) || 'Contact' }
   ]);
-  const [phone, setPhone] = useState(translations.phone_number || 'Call');
+  const [phone, setPhone] = useState(translations.phone_number === null ? '' : translations.phone_number || 'Call');
 
   useEffect(() => {
     setNavItems([
-      { id: 'home', label: translations.header_nav_home || 'Home' },
-      { id: 'about', label: translations.header_nav_about || 'About' },
-      { id: 'contact', label: translations.header_nav_contact || 'Contact' }
+      { id: 'home', label: (translations.header_nav_home === null ? '' : translations.header_nav_home) || 'Home' },
+      { id: 'about', label: (translations.header_nav_about === null ? '' : translations.header_nav_about) || 'About' },
+      { id: 'contact', label: (translations.header_nav_contact === null ? '' : translations.header_nav_contact) || 'Contact' }
     ]);
-    setPhone(translations.phone_number || 'Call');
+    setPhone((translations.phone_number === null ? '' : translations.phone_number) || 'Call');
   }, [translations]);
 
   const [editingNavIndex, setEditingNavIndex] = useState(null);
   const [editingPhone, setEditingPhone] = useState(false);
 
   const [editingBrand, setEditingBrand] = useState(false);
-  const [brand, setBrand] = useState(translations.header_brand || 'IKEA');
+  const [brand, setBrand] = useState(translations.header_brand === null ? '' : translations.header_brand || 'IKEA');
 
-  const [logoUrl, setLogoUrl] = useState(translations.header_logo_url || '');
+  const [logoUrl, setLogoUrl] = useState(translations.header_logo_url === null ? '' : translations.header_logo_url || '');
   const [editingLogo, setEditingLogo] = useState(false);
 
   const user = useSelector(state => state.user.user);
@@ -49,8 +49,8 @@ const Header = memo(({ activeSection, onNavigate, language, setLanguage, transla
   }, []);
 
   useEffect(() => {
-    setBrand(translations.header_brand || 'IKEA');
-    setLogoUrl(translations.header_logo_url || '');
+    setBrand(translations.header_brand === null ? '' : translations.header_brand || 'IKEA');
+    setLogoUrl(translations.header_logo_url === null ? '' : translations.header_logo_url || '');
   }, [translations]);
 
   const toggleMenu = useCallback(() => {

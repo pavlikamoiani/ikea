@@ -11,13 +11,13 @@ import Footer from './components/Footer.jsx';
 import defaultInstance from './api/defaultInstance';
 import Login from './components/Login.jsx';
 
-const SUPPORTED_LANGS = ['ka', 'ru', 'am'];
+const SUPPORTED_LANGS = ['ru', 'am'];
 
 function MainApp() {
   const { lang } = useParams();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('home');
-  const [language, setLanguage] = useState(SUPPORTED_LANGS.includes(lang) ? lang : 'ka');
+  const [language, setLanguage] = useState(SUPPORTED_LANGS.includes(lang) ? lang : 'am');
   const [translations, setTranslations] = useState({});
 
   useEffect(() => {
@@ -103,7 +103,7 @@ function App() {
     <Provider store={store}>
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/ka" replace />} />
+          <Route path="/" element={<Navigate to="/am" replace />} />
           <Route path="/:lang" element={<MainApp />} />
           <Route path="/login" element={<Login />} />
         </Routes>

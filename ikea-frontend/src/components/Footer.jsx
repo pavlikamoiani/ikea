@@ -1,6 +1,7 @@
 import React, { memo, useCallback, useState, useEffect } from 'react';
 import { Facebook, Twitter, Instagram, Youtube, ArrowUp, Pencil } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import defaultInstance from '../api/defaultInstance';
 
 const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
   const scrollToTop = useCallback(() => {
@@ -9,24 +10,26 @@ const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
 
   // Editable fields
   const [editingField, setEditingField] = useState(null);
-  const [brand, setBrand] = useState(translations.footer_brand || 'IKEA');
-  const [description, setDescription] = useState(translations.footer_description || 'Creating a better everyday life for the many people by offering well-designed, functional home furnishing solutions.');
+  const [brand, setBrand] = useState(translations.footer_brand === null ? '' : translations.footer_brand || 'IKEA');
+  const [description, setDescription] = useState(translations.footer_description === null ? '' : translations.footer_description || 'Creating a better everyday life for the many people by offering well-designed, functional home furnishing solutions.');
 
   const user = useSelector(state => state.user.user);
   const isAdmin = user?.role === 'admin';
 
+  const date = new Date().getFullYear();
+
   useEffect(() => {
-    setBrand(translations.footer_brand || 'IKEA');
-    setDescription(translations.footer_description || 'Creating a better everyday life for the many people by offering well-designed, functional home furnishing solutions.');
+    setBrand(translations.footer_brand === null ? '' : translations.footer_brand || 'IKEA');
+    setDescription(translations.footer_description === null ? '' : translations.footer_description || 'Creating a better everyday life for the many people by offering well-designed, functional home furnishing solutions.');
   }, [translations]);
 
   const handleBrandBlur = () => {
     setEditingField(null);
-    // defaultInstance.post(`/translations/${language}`, { key: 'footer_brand', value: brand });
+    defaultInstance.post(`/translations/${language}`, { key: 'footer_brand', value: brand });
   };
   const handleDescriptionBlur = () => {
     setEditingField(null);
-    // defaultInstance.post(`/translations/${language}`, { key: 'footer_description', value: description });
+    defaultInstance.post(`/translations/${language}`, { key: 'footer_description', value: description });
   };
 
   const socialLinks = [
@@ -109,7 +112,7 @@ const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
                 </p>
               )}
             </div>
-            <div className="flex space-x-4">
+            {/* <div className="flex space-x-4">
               {socialLinks.map((social, index) => (
                 <a
                   key={index}
@@ -120,14 +123,14 @@ const Footer = memo(({ onNavigate, language = 'ka', translations = {} }) => {
                   {social.icon}
                 </a>
               ))}
-            </div>
+            </div> */}
           </div>
         </div>
 
         {/* Bottom */}
         <div className="border-t border-blue-700 pt-8 flex flex-col md:flex-row items-center justify-between">
           <div className="text-blue-100 text-center md:text-left mb-4 md:mb-0">
-            <p>&copy; 2024 IKEA. All rights reserved. | Privacy Policy | Terms of Service</p>
+            <p>&copy; {date} IKEA. All rights reserved.</p>
           </div>
 
           <button

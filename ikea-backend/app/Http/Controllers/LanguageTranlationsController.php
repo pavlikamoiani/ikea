@@ -61,7 +61,7 @@ class LanguageTranlationsController extends Controller
 
         $data = $request->validate([
             'key' => 'required|string',
-            'value' => 'required|string',
+            'value' => 'nullable|string',
         ]);
 
         $model = (new LanguageTranlations())->setLanguage($lang);

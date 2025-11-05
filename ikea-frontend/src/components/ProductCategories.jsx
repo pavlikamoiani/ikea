@@ -8,10 +8,10 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
   const [loadedImages, setLoadedImages] = useState(new Set());
 
   const [editingField, setEditingField] = useState(null);
-  const [heading, setHeading] = useState(translations.categories_heading || 'Shop by');
-  const [highlight, setHighlight] = useState(translations.categories_highlight || 'Category');
-  const [description, setDescription] = useState(translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
-  const [phone, setPhone] = useState(translations.phone_number || 'Call');
+  const [heading, setHeading] = useState(translations.categories_heading === null ? '' : translations.categories_heading || 'Shop by');
+  const [highlight, setHighlight] = useState(translations.categories_highlight === null ? '' : translations.categories_highlight || 'Category');
+  const [description, setDescription] = useState(translations.categories_description === null ? '' : translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
+  const [phone, setPhone] = useState(translations.phone_number === null ? '' : translations.phone_number || 'Call');
 
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [categoryTitles, setCategoryTitles] = useState({});
@@ -22,21 +22,21 @@ const ProductCategories = memo(({ language = 'ka', translations = {} }) => {
   const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
-    setHeading(translations.categories_heading || 'Shop by');
-    setHighlight(translations.categories_highlight || 'Category');
-    setDescription(translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
-    setPhone(translations.phone_number || 'Call');
+    setHeading(translations.categories_heading === null ? '' : translations.categories_heading || 'Shop by');
+    setHighlight(translations.categories_highlight === null ? '' : translations.categories_highlight || 'Category');
+    setDescription(translations.categories_description === null ? '' : translations.categories_description || 'Find everything you need to create your dream home, from furniture to accessories');
+    setPhone(translations.phone_number === null ? '' : translations.phone_number || 'Call');
 
     const titles = {};
     categories.forEach(cat => {
-      titles[cat.id] = translations[`category_title_${cat.id}`] || cat.title;
+      titles[cat.id] = translations[`category_title_${cat.id}`] === null ? '' : translations[`category_title_${cat.id}`] || cat.title;
     });
     setCategoryTitles(titles);
 
     // Load category images from translations or fallback to default
     const images = {};
     categories.forEach(cat => {
-      images[cat.id] = translations[`category_image_${cat.id}`] || cat.image;
+      images[cat.id] = translations[`category_image_${cat.id}`] === null ? '' : translations[`category_image_${cat.id}`] || cat.image;
     });
     setCategoryImages(images);
   }, [translations]);

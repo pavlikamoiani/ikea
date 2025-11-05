@@ -6,26 +6,26 @@ import { useSelector } from 'react-redux';
 
 const Contact = memo(({ language = 'ka', translations = {} }) => {
   const [editingField, setEditingField] = useState(null);
-  const [heading, setHeading] = useState(translations.contact_heading || 'Get in');
-  const [highlight, setHighlight] = useState(translations.contact_highlight || 'Touch');
-  const [subtitle, setSubtitle] = useState(translations.contact_subtitle || 'Have questions about our products or need help with your home furnishing project? We\'re here to help!');
+  const [heading, setHeading] = useState(translations.contact_heading === null ? '' : translations.contact_heading || 'Get in');
+  const [highlight, setHighlight] = useState(translations.contact_highlight === null ? '' : translations.contact_highlight || 'Touch');
+  const [subtitle, setSubtitle] = useState(translations.contact_subtitle === null ? '' : translations.contact_subtitle || 'Have questions about our products or need help with your home furnishing project? We\'re here to help!');
   const [contactInfo, setContactInfo] = useState([
-    { icon: <MapPin className="w-6 h-6" />, title: translations.contact_0_title || 'Visit Our Store', details: translations.contact_0_details || '1234 Furniture Ave, Design District, City 12345', link: translations.contact_0_link || 'Get Directions' },
-    { icon: <Phone className="w-6 h-6" />, title: translations.contact_1_title || 'Call Us', details: translations.contact_1_details || '+1 (123) 456-7890', link: translations.contact_1_link || 'Call Now' },
-    { icon: <Clock className="w-6 h-6" />, title: translations.contact_2_title || 'Store Hours', details: translations.contact_2_details || 'Mon-Sat: 10am - 9pm', link: translations.contact_2_link || 'View Hours' }
+    { icon: <MapPin className="w-6 h-6" />, title: translations.contact_0_title === null ? '' : translations.contact_0_title || 'Visit Our Store', details: translations.contact_0_details === null ? '' : translations.contact_0_details || '1234 Furniture Ave, Design District, City 12345', link: translations.contact_0_link === null ? '' : translations.contact_0_link || 'Get Directions' },
+    { icon: <Phone className="w-6 h-6" />, title: translations.contact_1_title === null ? '' : translations.contact_1_title || 'Call Us', details: translations.contact_1_details === null ? '' : translations.contact_1_details || '+1 (123) 456-7890', link: translations.contact_1_link === null ? '' : translations.contact_1_link || 'Call Now' },
+    { icon: <Clock className="w-6 h-6" />, title: translations.contact_2_title === null ? '' : translations.contact_2_title || 'Store Hours', details: translations.contact_2_details === null ? '' : translations.contact_2_details || 'Mon-Sat: 10am - 9pm', link: translations.contact_2_link === null ? '' : translations.contact_2_link || 'View Hours' }
   ]);
 
   const user = useSelector(state => state.user.user);
   const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
-    setHeading(translations.contact_heading || 'Get in');
-    setHighlight(translations.contact_highlight || 'Touch');
-    setSubtitle(translations.contact_subtitle || 'Have questions about our products or need help with your home furnishing project? We\'re here to help!');
+    setHeading(translations.contact_heading === null ? '' : translations.contact_heading || 'Get in');
+    setHighlight(translations.contact_highlight === null ? '' : translations.contact_highlight || 'Touch');
+    setSubtitle(translations.contact_subtitle === null ? '' : translations.contact_subtitle || 'Have questions about our products or need help with your home furnishing project? We\'re here to help!');
     setContactInfo([
-      { icon: <MapPin className="w-6 h-6" />, title: translations.contact_0_title || 'Visit Our Store', details: translations.contact_0_details || '1234 Furniture Ave, Design District, City 12345', link: translations.contact_0_link || 'Get Directions' },
-      { icon: <Phone className="w-6 h-6" />, title: translations.contact_1_title || 'Call Us', details: translations.contact_1_details || '+1 (123) 456-7890', link: translations.contact_1_link || 'Call Now' },
-      { icon: <Clock className="w-6 h-6" />, title: translations.contact_2_title || 'Store Hours', details: translations.contact_2_details || 'Mon-Sat: 10am - 9pm', link: translations.contact_2_link || 'View Hours' }
+      { icon: <MapPin className="w-6 h-6" />, title: translations.contact_0_title === null ? '' : translations.contact_0_title || 'Visit Our Store', details: translations.contact_0_details === null ? '' : translations.contact_0_details || '1234 Furniture Ave, Design District, City 12345', link: translations.contact_0_link === null ? '' : translations.contact_0_link || 'Get Directions' },
+      { icon: <Phone className="w-6 h-6" />, title: translations.contact_1_title === null ? '' : translations.contact_1_title || 'Call Us', details: translations.contact_1_details === null ? '' : translations.contact_1_details || '+1 (123) 456-7890', link: translations.contact_1_link === null ? '' : translations.contact_1_link || 'Call Now' },
+      { icon: <Clock className="w-6 h-6" />, title: translations.contact_2_title === null ? '' : translations.contact_2_title || 'Store Hours', details: translations.contact_2_details === null ? '' : translations.contact_2_details || 'Mon-Sat: 10am - 9pm', link: translations.contact_2_link === null ? '' : translations.contact_2_link || 'View Hours' }
     ]);
   }, [translations]);
 

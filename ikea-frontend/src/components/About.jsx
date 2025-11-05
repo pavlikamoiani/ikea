@@ -9,48 +9,48 @@ const About = memo(({ language = 'ka', translations = {} }) => {
 
   // Editable state for heading and paragraphs
   const [editingField, setEditingField] = useState(null);
-  const [heading, setHeading] = useState(translations.about_heading || 'About');
-  const [highlight, setHighlight] = useState(translations.about_highlight || 'IKEA');
-  const [paragraph1, setParagraph1] = useState(translations.about_paragraph1 || 'Since 1943, IKEA has been creating a better everyday life for millions of people around the world. We offer well-designed, functional, and affordable home furnishing solutions that make good design accessible to everyone.');
-  const [paragraph2, setParagraph2] = useState(translations.about_paragraph2 || 'Our vision is to create a better everyday life for the many people by offering a wide range of home furnishing products of good design and function, at prices so low that as many people as possible can afford them.');
+  const [heading, setHeading] = useState(translations.about_heading === null ? '' : translations.about_heading || 'About');
+  const [highlight, setHighlight] = useState(translations.about_highlight === null ? '' : translations.about_highlight || 'IKEA');
+  const [paragraph1, setParagraph1] = useState(translations.about_paragraph1 === null ? '' : translations.about_paragraph1 || 'Since 1943, IKEA has been creating a better everyday life for millions of people around the world. We offer well-designed, functional, and affordable home furnishing solutions that make good design accessible to everyone.');
+  const [paragraph2, setParagraph2] = useState(translations.about_paragraph2 === null ? '' : translations.about_paragraph2 || 'Our vision is to create a better everyday life for the many people by offering a wide range of home furnishing products of good design and function, at prices so low that as many people as possible can afford them.');
 
   // Editable stats
   const [editingStat, setEditingStat] = useState(null);
   const [stats, setStats] = useState([
-    { value: translations.about_stat_0_value || '78+', label: translations.about_stat_0_label || 'Years of Innovation' },
-    { value: translations.about_stat_1_value || '460+', label: translations.about_stat_1_label || 'Stores Worldwide' },
-    { value: translations.about_stat_2_value || '60+', label: translations.about_stat_2_label || 'Countries' }
+    { value: translations.about_stat_0_value === null ? '' : translations.about_stat_0_value || '78+', label: translations.about_stat_0_label === null ? '' : translations.about_stat_0_label || 'Years of Innovation' },
+    { value: translations.about_stat_1_value === null ? '' : translations.about_stat_1_value || '460+', label: translations.about_stat_1_label === null ? '' : translations.about_stat_1_label || 'Stores Worldwide' },
+    { value: translations.about_stat_2_value === null ? '' : translations.about_stat_2_value || '60+', label: translations.about_stat_2_label === null ? '' : translations.about_stat_2_label || 'Countries' }
   ]);
 
   // Editable floating card
   const [editingFloating, setEditingFloating] = useState(null);
   const [floating, setFloating] = useState({
-    value: translations.about_floating_value || '1943',
-    label: translations.about_floating_label || 'Founded'
+    value: translations.about_floating_value === null ? '' : translations.about_floating_value || '1943',
+    label: translations.about_floating_label === null ? '' : translations.about_floating_label || 'Founded'
   });
 
   // Editable image
   const [editingImage, setEditingImage] = useState(false);
-  const [aboutImageUrl, setAboutImageUrl] = useState(translations.about_image_url || 'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800');
+  const [aboutImageUrl, setAboutImageUrl] = useState(translations.about_image_url === null ? '' : translations.about_image_url || 'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800');
 
   const user = useSelector(state => state.user.user);
   const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
-    setHeading(translations.about_heading || '');
-    setHighlight(translations.about_highlight || 'IKEA');
-    setParagraph1(translations.about_paragraph1 || '');
-    setParagraph2(translations.about_paragraph2 || 'Our vision is to create a better everyday life for the many people by offering a wide range of home furnishing products of good design and function, at prices so low that as many people as possible can afford them.');
+    setHeading(translations.about_heading === null ? '' : translations.about_heading || 'About');
+    setHighlight(translations.about_highlight === null ? '' : translations.about_highlight || 'IKEA');
+    setParagraph1(translations.about_paragraph1 === null ? '' : translations.about_paragraph1 || 'Since 1943, IKEA has been creating a better everyday life for millions of people around the world. We offer well-designed, functional, and affordable home furnishing solutions that make good design accessible to everyone.');
+    setParagraph2(translations.about_paragraph2 === null ? '' : translations.about_paragraph2 || 'Our vision is to create a better everyday life for the many people by offering a wide range of home furnishing products of good design and function, at prices so low that as many people as possible can afford them.');
     setStats([
-      { value: translations.about_stat_0_value || '78+', label: translations.about_stat_0_label || 'Years of Innovation' },
-      { value: translations.about_stat_1_value || '460+', label: translations.about_stat_1_label || 'Stores Worldwide' },
-      { value: translations.about_stat_2_value || '60+', label: translations.about_stat_2_label || 'Countries' }
+      { value: translations.about_stat_0_value === null ? '' : translations.about_stat_0_value || '78+', label: translations.about_stat_0_label === null ? '' : translations.about_stat_0_label || 'Years of Innovation' },
+      { value: translations.about_stat_1_value === null ? '' : translations.about_stat_1_value || '460+', label: translations.about_stat_1_label === null ? '' : translations.about_stat_1_label || 'Stores Worldwide' },
+      { value: translations.about_stat_2_value === null ? '' : translations.about_stat_2_value || '60+', label: translations.about_stat_2_label === null ? '' : translations.about_stat_2_label || 'Countries' }
     ]);
     setFloating({
-      value: translations.about_floating_value || '1943',
-      label: translations.about_floating_label || 'Founded'
+      value: translations.about_floating_value === null ? '' : translations.about_floating_value || '1943',
+      label: translations.about_floating_label === null ? '' : translations.about_floating_label || 'Founded'
     });
-    setAboutImageUrl(translations.about_image_url || 'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800');
+    setAboutImageUrl(translations.about_image_url === null ? '' : translations.about_image_url || 'https://images.pexels.com/photos/1571453/pexels-photo-1571453.jpeg?auto=compress&cs=tinysrgb&w=800');
   }, [translations]);
 
   const handleImageLoad = useCallback(() => {
